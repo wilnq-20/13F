@@ -34,9 +34,8 @@ def main():
 
     r2 = requests.get(file_url)
     file_soup = yum(r2.content, 'lxml') # extracts .txt xml soup
-    # print(file_soup.prettify())
 
-    file_col = pullFormat(file_soup)
+    file_col = pullColumn(file_soup)
     file_rows = pullRows(file_soup, file_col)
 
     # combine into a data frame using python pandas
@@ -63,9 +62,8 @@ def findfund(cik):
     return find_soup
 
 # accepts soup of txt and returns list of each column header and row
-def pullFormat(text):
+def pullColumn(text):
     all_dlabel = []
-    rows = []
     info_array = text.find_all('infotable')
 
     # should we check for available info
@@ -81,15 +79,16 @@ def pullFormat(text):
 
 def pullRows(file_soup, dlabel):
     rows = []
-    for row in file_soup.find_all('infotable'): #iterate through and build list for row
-        temp_list = []
+
+    for row in file_soup.find_all('infoTable'): #iterate through and build list for row
+        curr = []
         for column in dlabel:
             if (row.find(column) is None):
-                temp_list.append('NA')  #no val for column, so label NA
+                curr.append('NA')  #no val for column, so label NA
             else:
-                temp_list.append(row.find(column).string)
-        rows.append(temp_list)
-        return rows
+                curr.append(row.find(column).string)
+        rows.append(curr)
+    return rows
 
 
 
